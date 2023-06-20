@@ -22,11 +22,11 @@ PZEM004Tv30 pzem(PZEM_SERIAL);
 #define ANALOG_IN_PIN 35  
 #define DHTPIN 25  
 
-int sensorIn = 34;
-int relay1= 23;
-int relay2= 22;
-int relay3= 21;
-int relay4= 19;
+//int sensorIn = 34;
+int relay1= 22;
+int relay2= 23;
+int relay3= 19;
+int relay4= 21;
 int relay5= 18;
 int relay6= 5;
 int relay7= 27;
@@ -55,8 +55,8 @@ WiFiClient  client;
 HTTPClient http;
 DHT dht(DHTPIN, DHT11);
 
-const char* ssid ="S10";
-const char* pass ="12345678";
+const char* ssid ="Pyro3";
+const char* pass ="1000101000";
 String ServerName = "https://api.thingspeak.com/update?api_key=UZOBPP8IJ3H1SSBB&field1=0";
 
 
@@ -78,7 +78,7 @@ void setup() {
   digitalWrite(relay6, HIGH);
   pinMode(ledPower, OUTPUT);
   pinMode(dustPin, INPUT);
-  pinMode(sensorIn, INPUT);
+  //pinMode(sensorIn, INPUT);
   
   pinMode(relay1,OUTPUT);
   pinMode(relay2,OUTPUT);
@@ -121,26 +121,26 @@ void loop() {
 // 
 // ========================current DC=====================   
 float Samples = 0.0 , counts=0.0, avgCounts=0.0;
-  for (int x =0; x<500; x++){
+  for (int x =0; x<300; x++){
      counts = analogRead(currentdc);
      Samples += counts;
       delay(3);
     }
-  avgCounts = Samples/500;
+  avgCounts = Samples/300;
  
   float voltage = avgCounts * vpp; // 3.3/4096
   float voltage1 = avgCounts * vpp;
   if (voltage1 <= 2.50) {
-    voltage -= 2.4;
+    voltage -= 2.33;
   }else if (voltage1 >= 2.76) {
-    voltage -= 2.47;
+    voltage -= 2.42;
   }else if (voltage1 < 2.76){
-      voltage -= 2.45;
+      voltage -= 2.4;
   } 
 
   float amp = voltage / sens;
 
-   if (amp < 0.10) {
+   if (amp < 0.40) {
        amp = 0;
     }
     
@@ -158,7 +158,8 @@ float Samples = 0.0 , counts=0.0, avgCounts=0.0;
   Serial.println(in_voltage, 2);
 
   Serial.print("amps "+ String(amp));
-
+  Serial.print("voltage " + String(voltage1)+"  ");
+  Serial.println("counts " + String(avgCounts)+"  ");
 
    voltage = pzem.voltage();
    current = pzem.current();
@@ -168,7 +169,7 @@ float Samples = 0.0 , counts=0.0, avgCounts=0.0;
  if (last_light_state == 2){
    digitalWrite(relay1, LOW);
     Serial.println("LIGHT is On");
- }else{
+ }else if(last_light_state == 1){
   digitalWrite(relay1, HIGH);
   Serial.println("LIGHT is Off");
  }
@@ -178,7 +179,7 @@ float Samples = 0.0 , counts=0.0, avgCounts=0.0;
  if (last_light_state1 == 2){
    digitalWrite(relay2, LOW);
     Serial.println("LIGHT2 is On");
- }else{
+ }else if(last_light_state1 == 1){
 
       digitalWrite(relay2, HIGH);
       Serial.println("LIGHT2 is Off");
@@ -190,7 +191,7 @@ int last_light_state2 = ThingSpeak.readIntField(myChannelNumber1, 3, myReadAPIKe
  if (last_light_state2 == 2){
    digitalWrite(relay3, LOW);
     Serial.println("LIGHT3 is On");
- }else{
+ }else if(last_light_state2 == 1){
 
       digitalWrite(relay3, HIGH);
       Serial.println("LIGHT3 is Off");
@@ -201,7 +202,7 @@ int last_light_state2 = ThingSpeak.readIntField(myChannelNumber1, 3, myReadAPIKe
  if (last_light_state3 == 2){
    digitalWrite(relay4, LOW);
     Serial.println("LIGHT4 is On");
- }else{
+ }else if(last_light_state3 == 1){
 
       digitalWrite(relay4, HIGH);
       Serial.println("LIGHT4 is Off");
@@ -213,9 +214,9 @@ int last_light_state2 = ThingSpeak.readIntField(myChannelNumber1, 3, myReadAPIKe
  if (last_light_state4 == 2){
    digitalWrite(relay5, LOW);
     Serial.println("LIGHT5 is On");
- }else{
+ }else if(last_light_state4 == 1){
   digitalWrite(relay5, HIGH);
-  Serial.println("LIGHT5 is Off");
+   Serial.println("LIGHT5 is Off");
  }
  
  // relay 6
@@ -224,7 +225,7 @@ int last_light_state2 = ThingSpeak.readIntField(myChannelNumber1, 3, myReadAPIKe
  if (last_light_state5 == 2){
    digitalWrite(relay6, LOW);
     Serial.println("LIGHT6 is On");
- }else{
+ }else if(last_light_state5 == 1){
 
       digitalWrite(relay6, HIGH);
       Serial.println("LIGHT6 is Off");
@@ -234,12 +235,12 @@ int last_light_state2 = ThingSpeak.readIntField(myChannelNumber1, 3, myReadAPIKe
  
   int last_light_state6 = ThingSpeak.readIntField(myChannelNumber1, 7, myReadAPIKey1);
  if (last_light_state6 == 2){
-   digitalWrite(relay7, HIGH);
-    Serial.println("LIGHT6 is On");
- }else{
+    digitalWrite(relay7, HIGH);
+    Serial.println("LIGHT7 is On");
+ }else if(last_light_state6 == 1){
 
-      digitalWrite(relay6, LOW);
-      Serial.println("LIGHT6 is Off");
+    digitalWrite(relay7, LOW);
+    Serial.println("LIGHT7 is Off");
  }
 
 
